@@ -17,4 +17,4 @@ This project is a simple task manager built with PyScript, a library that allows
 >JavaScript: Used for interacting with DOM elements and browser APIs
 
 
-#visit : https://your-works.netlify.app/
+# visit : https://your-works.netlify.app/
