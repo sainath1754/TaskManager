@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyScript Task Manager</title>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        h1, h2 { 
+            text-align: center;
+            color: #333;
+        }
+        .task-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        ul { 
+            list-style-type: none; 
+            padding: 0; 
+        }
+        li { 
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: flex-start;
+        }
+        input[type="text"], textarea { 
+            width: 100%; 
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .add-task-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+        button { 
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            margin-left: auto;
+        }
+        .delete-btn:hover {
+            background-color: #da190b;
+        }
+        .task-content {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .task-title {
+            font-weight: bold;
+        }
+        .task-description {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task Manager</h1>
+    <div class="task-container">
+        <input type="text" id="task-input" placeholder="Enter a new task">
+        <textarea id="task-description" placeholder="Enter task description (optional)"></textarea>
+        <div class="add-task-container">
+            <button py-click="add_task()">Add Task</button>
+        </div>
+        <h2 id="pending-tasks-heading" style="display: none;">Pending Tasks</h2>
+        <ul id="task-list"></ul>
+    </div>
+
+    <py-script>
+import js
+import json
+from pyodide.ffi import create_proxy
+
+def load_tasks():
+    tasks_json = js.localStorage.getItem("tasks")
+    if tasks_json:
+        return json.loads(tasks_json)
+    return []
+
+def save_tasks():
+    js.localStorage.setItem("tasks", json.dumps(tasks))
+
+tasks = load_tasks()
+
+def add_task():
+    task_title = js.document.getElementById("task-input").value
+    task_description = js.document.getElementById("task-description").value
+    if task_title:
+        tasks.append({"title": task_title, "description": task_description, "completed": False})
+        js.document.getElementById("task-input").value = ""
+        js.document.getElementById("task-description").value = ""
+        save_tasks()
+        update_task_list()
+
+def toggle_task(index):
+    tasks[index]["completed"] = not tasks[index]["completed"]
+    save_tasks()
+    update_task_list()
+
+def delete_task(index):
+    tasks.pop(index)
+    save_tasks()
+    update_task_list()
+
+def update_task_list():
+    task_list = js.document.getElementById("task-list")
+    pending_tasks_heading = js.document.getElementById("pending-tasks-heading")
+    task_list.innerHTML = ""
+    
+    pending_tasks = [task for task in tasks if not task["completed"]]
+    
+    if pending_tasks:
+        pending_tasks_heading.style.display = "block"
+    else:
+        pending_tasks_heading.style.display = "none"
+    
+    for i, task in enumerate(tasks):
+        li = js.document.createElement("li")
+        
+        checkbox = js.document.createElement("input")
+        checkbox.type = "checkbox"
+        checkbox.checked = task["completed"]
+        checkbox.onchange = create_proxy(lambda event, i=i: toggle_task(i))
+        
+        task_content = js.document.createElement("div")
+        task_content.classList.add("task-content")
+        
+        title_span = js.document.createElement("span")
+        title_span.textContent = task["title"]
+        title_span.classList.add("task-title")
+        if task["completed"]:
+            title_span.style.textDecoration = "line-through"
+        
+        description_p = js.document.createElement("p")
+        description_p.textContent = task["description"]
+        description_p.classList.add("task-description")
+        
+        delete_btn = js.document.createElement("button")
+        delete_btn.textContent = "Delete"
+        delete_btn.classList.add("delete-btn")
+        delete_btn.onclick = create_proxy(lambda event, i=i: delete_task(i))
+        
+        task_content.appendChild(title_span)
+        task_content.appendChild(description_p)
+        
+        li.appendChild(checkbox)
+        li.appendChild(task_content)
+        li.appendChild(delete_btn)
+        task_list.appendChild(li)
+
+update_task_list()
+    </py-script>
+</body>
+</html>
