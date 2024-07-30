@@ -60,10 +60,17 @@
         }
         .delete-btn {
             background-color: #f44336;
-            margin-left: auto;
+            margin-top: 10px;
         }
         .delete-btn:hover {
             background-color: #da190b;
+        }
+        .edit-btn {
+            background-color: #ff9800;
+            margin-top: 10px;
+        }
+        .edit-btn:hover {
+            background-color: #e68a00;
         }
         .task-content {
             flex-grow: 1;
@@ -76,6 +83,11 @@
             margin-top: 5px;
             font-size: 0.9em;
             color: #666;
+        }
+        .task-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
         }
     </style>
 </head>
@@ -127,6 +139,17 @@ def delete_task(index):
     save_tasks()
     update_task_list()
 
+def edit_task(index):
+    task = tasks[index]
+    new_title = js.prompt("Edit task title:", task["title"])
+    new_description = js.prompt("Edit task description:", task["description"])
+    if new_title is not None:
+        task["title"] = new_title
+    if new_description is not None:
+        task["description"] = new_description
+    save_tasks()
+    update_task_list()
+
 def update_task_list():
     task_list = js.document.getElementById("task-list")
     pending_tasks_heading = js.document.getElementById("pending-tasks-heading")
@@ -160,6 +183,14 @@ def update_task_list():
         description_p.textContent = task["description"]
         description_p.classList.add("task-description")
         
+        task_actions = js.document.createElement("div")
+        task_actions.classList.add("task-actions")
+        
+        edit_btn = js.document.createElement("button")
+        edit_btn.textContent = "Edit"
+        edit_btn.classList.add("edit-btn")
+        edit_btn.onclick = create_proxy(lambda event, i=i: edit_task(i))
+        
         delete_btn = js.document.createElement("button")
         delete_btn.textContent = "Delete"
         delete_btn.classList.add("delete-btn")
@@ -168,9 +199,12 @@ def update_task_list():
         task_content.appendChild(title_span)
         task_content.appendChild(description_p)
         
+        task_actions.appendChild(edit_btn)
+        task_actions.appendChild(delete_btn)
+        
         li.appendChild(checkbox)
         li.appendChild(task_content)
-        li.appendChild(delete_btn)
+        li.appendChild(task_actions)
         task_list.appendChild(li)
 
 update_task_list()
