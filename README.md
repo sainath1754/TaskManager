@@ -8,10 +8,10 @@ This project is a simple task manager built with PyScript, a library that allows
 >Persist tasks in local storage
 
 # Technologies Used
->>HTML: Provides the structure of the webpage.
+>HTML: Provides the structure of the webpage.
 
->>CSS: Styles the webpage for visual appeal.
+>CSS: Styles the webpage for visual appeal.
 
->>PyScript: Enables running Python code in the browser for interactivity.
+>PyScript: Enables running Python code in the browser for interactivity.
 
->>JavaScript: Used for interacting with DOM elements and browser APIs
+>JavaScript: Used for interacting with DOM elements and browser APIs
