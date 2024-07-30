@@ -9,6 +9,9 @@ This project is a simple task manager built with PyScript, a library that allows
 
 # Technologies Used
 >>HTML: Provides the structure of the webpage.
+
 >>CSS: Styles the webpage for visual appeal.
+
 >>PyScript: Enables running Python code in the browser for interactivity.
+
 >>JavaScript: Used for interacting with DOM elements and browser APIs
